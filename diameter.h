@@ -12,6 +12,12 @@ template <class Graph> size_t getEstimatedDiameter(const Graph &graph) {
   boost::breadth_first_search(
       graph, 0, boost::visitor(boost::make_bfs_visitor(recorder)));
 
+  /* для нахождения диаметра надо:
+   * 1. запустить BFS из произвольной вершины, найти от нее самую удаленную
+   * 2. запустить второй BFS из самой удаленной на шаге 1
+   * 3. максимальное расстояние от вершины на шаге 2 и будет диаметром
+   * в текущей реализации функция не находит диаметра, а просто суммируется два максимальных кратчайших расстояния
+   */
   size_t first_max = 0;
   size_t second_max = 0;
   for (const auto &vertex :

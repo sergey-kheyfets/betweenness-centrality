@@ -1,8 +1,11 @@
+#include <cstdint>
 #include <iostream>
+#include <random>
 
 #include "centroids.h"
 #include "diameter.h"
 #include "io.h"
+#include "paths.h"
 
 void printInfo(const Graph &graph) {
   std::cout << "Graph has " << boost::num_vertices(graph) << " vertices and "
@@ -45,9 +48,46 @@ int main(int argc, char *argv[]) {
   // boost::make_iterator_range(boost::vertices(graph))) {
   //     std::cout << graph[vertex].nearest_centroid << ' ';
   // }
-  std::cout << std::endl;
-
   std::filesystem::path output_path = argv[1];
   output_path = output_path.parent_path() / "result.dot";
   writeGraph(&graph, {output_path});
+
+  auto index_map = (boost::get(boost::vertex_index, graph));
+  CentroidsPathEstimator estimator{graph, centroids};
+
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<> dist(0, boost::num_vertices(graph) - 1);
+
+  auto begin = *(boost::vertices(graph).first);
+
+  std::vector<int64_t> exact, estimated;
+  size_t number_of_trials = 100;
+  for (size_t i = 0; i != number_of_trials; ++i) {
+    auto first = begin + dist(gen);
+    auto second = begin + dist(gen);
+    exact.push_back(getDistances(graph, first)[index_map[second]]);
+    estimated.push_back(estimator.Estimate(first, second));
+  }
+
+  long double mae = 0;
+  long double mse = 0;
+
+  long double mean_exact =
+      std::accumulate(exact.begin(), exact.end(), 0.0) / number_of_trials;
+  long double mean_estimated =
+      std::accumulate(estimated.begin(), estimated.end(), 0.0) /
+      number_of_trials;
+
+  for (size_t i = 0; i != number_of_trials; ++i) {
+    mae += std::abs(exact[i] - estimated[i]);
+    mse += (exact[i] - estimated[i]) * (exact[i] - estimated[i]);
+  }
+  mae /= number_of_trials;
+  mse /= number_of_trials;
+
+  std::cout << "Mean exact distance: " << mean_exact << std::endl;
+  std::cout << "Mean estimated distance: " << mean_estimated << std::endl;
+  std::cout << "Mean absolute error: " << mae << std::endl;
+  std::cout << "Mean squared error: " << mse << std::endl;
 }

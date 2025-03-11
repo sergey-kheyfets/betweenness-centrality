@@ -27,11 +27,7 @@ template <class Graph> size_t getEstimatedDiameter(const Graph &graph) {
 template <class Graph> size_t getExactDiameter(const Graph &graph) {
   size_t max = 0;
   for (const auto &start : boost::make_iterator_range(boost::vertices(graph))) {
-    auto distances = getDistances(graph, start);
-
-    for (const auto &distance : distances) {
-      max = std::max(max, distance);
-    }
+    max = std::max(max, std::ranges::max(getDistances(graph, start)));
   }
 
   return max;

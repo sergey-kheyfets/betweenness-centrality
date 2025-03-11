@@ -70,12 +70,8 @@ std::vector<Vertex<Graph>> getBestCentroids(const Graph &graph, size_t number) {
   auto adjacency_degrees = getAdjacencyDegrees_(graph);
   auto entropy = getAdjacencyEntropy_(graph, adjacency_degrees);
 
-  std::vector<Vertex<Graph>> vertices;
-  vertices.reserve(boost::num_vertices(graph));
-  for (const auto &vertex :
-       boost::make_iterator_range(boost::vertices(graph))) {
-    vertices.push_back(vertex);
-  }
+  auto [begin, end] = boost::vertices(graph);
+  std::vector<Vertex<Graph>> vertices(begin, end);
 
   typename boost::property_map<Graph, boost::vertex_index_t>::type index_map =
       get(boost::vertex_index, graph);

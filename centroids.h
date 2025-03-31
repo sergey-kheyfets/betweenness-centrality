@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <queue>
 
 #include <boost/graph/adjacency_list.hpp>
@@ -61,8 +62,9 @@ size_t getCentroidsNumber(const Graph &graph, long double c,
   if (diameter <= 2) {
     return 1;
   }
-  return std::floor(
-      c * (std::floor(std::log2(diameter - 2)) + 1 + std::log(1 / delta)));
+  return std::min(boost::num_vertices(graph),
+                  static_cast<size_t>(c * (std::floor(std::log2(diameter - 2)) +
+                                           1 + std::log(1 / delta))));
 }
 
 template <class Graph>
@@ -71,18 +73,31 @@ std::vector<Vertex<Graph>> getBestCentroids(const Graph &graph, size_t number) {
   auto entropy = getAdjacencyEntropy_(graph, adjacency_degrees);
 
   auto [begin, end] = boost::vertices(graph);
-  std::vector<Vertex<Graph>> vertices(begin, end);
 
   typename boost::property_map<Graph, boost::vertex_index_t>::type index_map =
       get(boost::vertex_index, graph);
-  std::partial_sort(vertices.begin(), vertices.begin() + number, vertices.end(),
-                    [&index_map, &entropy](auto &first, auto &second) {
-                      return entropy[index_map[first]] >
-                             entropy[index_map[second]];
-                    });
 
-  vertices.resize(number);
-  return vertices;
+  std::vector<Vertex<Graph>> heap(number);
+  for (size_t i = 0; i != number; ++i) {
+    heap[i] = *(begin + i);
+  }
+
+  auto compare = [&index_map, &entropy](const Vertex<Graph> &first,
+                                        const Vertex<Graph> &second) {
+    return entropy[index_map[first]] > entropy[index_map[second]];
+  };
+
+  std::make_heap(heap.begin(), heap.end(), compare);
+
+  for (size_t i = number; i < boost::num_vertices(graph); ++i) {
+    heap.push_back(*(begin + i));
+    std::push_heap(heap.begin(), heap.end(), compare);
+
+    std::pop_heap(heap.begin(), heap.end(), compare);
+    heap.pop_back();
+  }
+
+  return heap;
 }
 
 template <class Graph>

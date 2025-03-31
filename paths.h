@@ -23,11 +23,21 @@ public:
   size_t Estimate(const Vertex<Graph> &first, const Vertex<Graph> &second) {
     size_t first_distance =
         centroid_distances_[graph_[first].nearest_centroid][index_map_[first]];
+    size_t centroids_distance =
+        centroid_distances_[graph_[first].nearest_centroid]
+                           [graph_[second].nearest_centroid];
     size_t second_distance =
         centroid_distances_[graph_[second].nearest_centroid]
                            [index_map_[second]];
-    return first_distance + second_distance;
+    return first_distance + centroids_distance + second_distance;
   }
+
+  //   size_t centroids[2] = { graph_[first].nearest_centroid,
+  //   graph_[second].nearest_centroid };
+  // size_t distances[2] = {
+  // centroid_distances_[centroids[0]][index_map_[first]],
+  // centroid_distances_[centroids[1]][index_map_[second]]; return distances[0]
+  // + centroid_distances_[centroids[0]][centroids[1]] + distances[1];
 
 private:
   const Graph &graph_; // should be replaced by a shared_pointer (or maybe I'll

@@ -1,13 +1,23 @@
 #include "io.h"
 
-// Function to add an edge between two nodes, adding vertices if necessary
-void addEdgeToGraph(Graph *graph, size_t first, size_t second) {
-  // Ensure the graph has enough vertices
-  size_t graph_size = boost::num_vertices(*graph);
-  for (size_t i = graph_size; i < std::max(first, second) + 1; ++i) {
-    boost::add_vertex(*graph);
+size_t addVertexIfNotExist(Graph &graph,
+                           std::unordered_map<size_t, size_t> &compress,
+                           size_t vertex) {
+  if (compress.find(vertex) == compress.end()) {
+    compress[vertex] = compress.size();
+    boost::add_vertex(graph);
+    return compress.size() - 1;
   }
-  boost::add_edge(first, second, *graph);
+  return compress[vertex];
+}
+
+// Function to add an edge between two nodes, adding vertices if necessary
+void addEdgeToGraph(Graph &graph, std::unordered_map<size_t, size_t> &compress,
+                    size_t first, size_t second) {
+  // Add vertices if needed
+  first = addVertexIfNotExist(graph, compress, first);
+  second = addVertexIfNotExist(graph, compress, second);
+  boost::add_edge(first, second, graph);
 }
 
 Graph readGraph(const std::filesystem::path &path) {
@@ -19,19 +29,26 @@ Graph readGraph(const std::filesystem::path &path) {
 
   Graph graph;
 
+  std::unordered_map<size_t, size_t> compress;
+
   std::string line;
   while (std::getline(file, line)) {
+    // Comments: "# ..."
+    if (line[0] == '#') {
+      std::cout << line << std::endl;
+      continue;
+    }
     // Example line: "0 4 {'weight': 0.002105263157894737}"
     std::istringstream iss(line);
-    int first, second;
+    size_t first, second;
     if (!(iss >> first >> second)) {
       std::cerr << "Invalid line format: " << line << std::endl;
       continue; // Skip invalid lines
     }
 
-    // Add edge to the graph (vertices are added automatically if they don't
+    // Add edge to the graph  (vertices are added automatically if they don't
     // exist)
-    addEdgeToGraph(&graph, first, second);
+    addEdgeToGraph(graph, compress, first, second);
   }
 
   file.close();

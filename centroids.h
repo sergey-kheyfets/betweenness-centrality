@@ -35,7 +35,7 @@ std::vector<size_t> getAdjacencyDegrees(const Graph &graph) {
 template <class Graph>
 std::vector<long double>
 getAdjacencyEntropy(const Graph &graph,
-                     const std::vector<size_t> &adjacency_degrees) {
+                    const std::vector<size_t> &adjacency_degrees) {
   std::vector<long double> entropy(boost::num_vertices(graph), 0);
   typename boost::property_map<Graph, boost::vertex_index_t>::type index_map =
       get(boost::vertex_index, graph);
@@ -134,7 +134,8 @@ void fillNearestCentroids(Graph *graph,
 }
 
 template <class Graph>
-auto getCentroidSubgraphView(const Graph& graph, const Vertex<Graph>& centroid) {
+auto getCentroidSubgraphView(const Graph &graph,
+                             const Vertex<Graph> &centroid) {
   std::function filter{[&](Vertex<Graph> vertex) {
     return graph[vertex].nearest_centroid == graph[centroid].nearest_centroid;
   }};
@@ -142,7 +143,9 @@ auto getCentroidSubgraphView(const Graph& graph, const Vertex<Graph>& centroid) 
 }
 
 template <class Graph>
-std::vector<Vertex<Graph>> getAndApplyCentroids(Graph& graph, long double c = 0.33, long double delta = 0.1) {
+std::vector<Vertex<Graph>> getAndApplyCentroids(Graph &graph,
+                                                long double c = 0.33,
+                                                long double delta = 0.1) {
   auto centroids_number = getCentroidsNumber(graph, c, delta);
   auto centroids = getBestCentroids(graph, centroids_number);
   fillNearestCentroids(&graph, centroids);

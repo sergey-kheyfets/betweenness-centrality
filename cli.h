@@ -1,32 +1,30 @@
 #pragma once
 
-#include "traits.h"
-#include "io.h"
 #include "brandes.h"
 #include "components.h"
+#include "io.h"
 #include "paths.h"
+#include "traits.h"
 #include "utils.h"
-#include "centrality.h"
 
-#include <boost/graph/visitors.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/breadth_first_search.hpp>
+#include <boost/graph/visitors.hpp>
 #include <boost/range/iterator_range_core.hpp>
 
-std::vector<Graph> readGraphIntoComponents(std::filesystem::path& path);
+std::vector<Graph> readGraphIntoComponents(std::filesystem::path &path);
 
 template <class Graph> void printBasicInfo(const Graph &graph) {
   std::cout << "Graph has " << boost::num_vertices(graph) << " vertices and "
             << boost::num_edges(graph) << " edges." << std::endl;
-  
 }
 
-template <class Graph>
-void printExactCentrality(Graph& graph) {
+template <class Graph> void printExactCentrality(Graph &graph) {
   std::map<int64_t, long double> result;
 
-  auto bc = getExactBetwennessCentrality(graph);  
-  for (const auto& vertex : boost::make_iterator_range(boost::vertices(graph))) {
+  auto bc = getExactBetwennessCentrality(graph);
+  for (const auto &vertex :
+       boost::make_iterator_range(boost::vertices(graph))) {
     result[graph[vertex].id] = bc[vertex];
   }
   std::cout << std::endl << "Exact BC: " << result << "\n\n";

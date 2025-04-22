@@ -14,6 +14,7 @@
 
 struct VertexInfo {
   size_t nearest_centroid;
+  size_t id;
 };
 
 // Define the graph using Boost adjacency_list

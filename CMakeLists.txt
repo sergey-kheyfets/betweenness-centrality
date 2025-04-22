@@ -16,7 +16,7 @@ endif()
 include_directories(${Boost_INCLUDE_DIRS})
 
 # Add the executable and specify its source files
-add_executable(betweenness-centrality main.cpp io.cpp)
+add_executable(betweenness-centrality main.cpp io.cpp cli.cpp)
 
 # Link the Boost Graph library to your executable
 target_link_libraries(betweenness-centrality PRIVATE Boost::graph)

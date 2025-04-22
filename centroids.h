@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <boost/graph/filtered_graph.hpp>
 #include <queue>
 
 #include <boost/graph/adjacency_list.hpp>
@@ -9,10 +10,10 @@
 #include "traits.h"
 
 template <class Graph>
-struct AdjacencyDegreeVisitor_ : public boost::default_bfs_visitor {
+struct AdjacencyDegreeVisitor : public boost::default_bfs_visitor {
   std::vector<size_t> &adjacency_degrees;
 
-  AdjacencyDegreeVisitor_(std::vector<size_t> &adjacency_degrees)
+  AdjacencyDegreeVisitor(std::vector<size_t> &adjacency_degrees)
       : adjacency_degrees(adjacency_degrees) {}
 
   void examine_edge(const Edge<Graph> &edge, const Graph &graph) const {
@@ -22,19 +23,19 @@ struct AdjacencyDegreeVisitor_ : public boost::default_bfs_visitor {
 };
 
 template <class Graph>
-std::vector<size_t> getAdjacencyDegrees_(const Graph &graph) {
+std::vector<size_t> getAdjacencyDegrees(const Graph &graph) {
   std::vector<size_t> adjacency_degrees(boost::num_vertices(graph));
   boost::breadth_first_search(
       graph, 0,
-      boost::visitor(AdjacencyDegreeVisitor_<Graph>(adjacency_degrees)));
+      boost::visitor(AdjacencyDegreeVisitor<Graph>(adjacency_degrees)));
 
   return adjacency_degrees;
 }
 
 template <class Graph>
 std::vector<long double>
-getAdjacencyEntropy_(const Graph &graph,
-                     const std::vector<size_t> &adjacency_degrees) {
+getAdjacencyEntropy(const Graph &graph,
+                    const std::vector<size_t> &adjacency_degrees) {
   std::vector<long double> entropy(boost::num_vertices(graph), 0);
   typename boost::property_map<Graph, boost::vertex_index_t>::type index_map =
       get(boost::vertex_index, graph);
@@ -69,8 +70,8 @@ size_t getCentroidsNumber(const Graph &graph, long double c,
 
 template <class Graph>
 std::vector<Vertex<Graph>> getBestCentroids(const Graph &graph, size_t number) {
-  auto adjacency_degrees = getAdjacencyDegrees_(graph);
-  auto entropy = getAdjacencyEntropy_(graph, adjacency_degrees);
+  auto adjacency_degrees = getAdjacencyDegrees(graph);
+  auto entropy = getAdjacencyEntropy(graph, adjacency_degrees);
 
   auto [begin, end] = boost::vertices(graph);
 
@@ -130,4 +131,23 @@ void fillNearestCentroids(Graph *graph,
       }
     }
   }
+}
+
+template <class Graph>
+auto getCentroidSubgraphView(const Graph &graph,
+                             const Vertex<Graph> &centroid) {
+  std::function filter{[&](Vertex<Graph> vertex) {
+    return graph[vertex].nearest_centroid == graph[centroid].nearest_centroid;
+  }};
+  return boost::filtered_graph(graph, boost::keep_all{}, filter);
+}
+
+template <class Graph>
+std::vector<Vertex<Graph>> getAndApplyCentroids(Graph &graph,
+                                                long double c = 0.33,
+                                                long double delta = 0.1) {
+  auto centroids_number = getCentroidsNumber(graph, c, delta);
+  auto centroids = getBestCentroids(graph, centroids_number);
+  fillNearestCentroids(&graph, centroids);
+  return centroids;
 }

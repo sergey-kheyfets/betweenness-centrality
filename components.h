@@ -1,6 +1,9 @@
+#pragma once
+
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/connected_components.hpp>
 #include <vector>
+#include <concepts>
 
 #include "traits.h"
 
@@ -17,6 +20,7 @@ auto splitIntoComponents(Graph &&graph) {
        boost::make_iterator_range(boost::vertices(graph))) {
     auto &component = result[component_map[vertex]];
     global_to_local_map[vertex] = boost::add_vertex(component);
+    component[global_to_local_map[vertex]].id = graph[vertex].id;
   }
 
   for (const auto &edge : boost::make_iterator_range(boost::edges(graph))) {

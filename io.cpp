@@ -5,7 +5,8 @@ size_t addVertexIfNotExist(Graph &graph,
                            size_t vertex) {
   if (compress.find(vertex) == compress.end()) {
     compress[vertex] = compress.size();
-    boost::add_vertex(graph);
+    auto vertex_iterator = boost::add_vertex(graph);
+    graph[vertex_iterator].id = vertex;
     return compress.size() - 1;
   }
   return compress[vertex];

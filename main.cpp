@@ -1,21 +1,14 @@
 #include <cassert>
 #include <iostream>
 
-#include "components.h"
-#include "diameter.h"
-
-#include "io.h"
-
-#include "paths.h"
-#include "utils.h"
-
+#include "centroids.h"
 #include "cli.h"
 
 int main(int argc, char *argv[]) {
   if (argc < 3) {
     std::cerr << "Usage: " << argv[0]
               << " <dataset_filename> <command> <...parameters>" << std::endl;
-    std::cerr << "Commands: exact-bc, shortest-paths" << std::endl;
+    std::cerr << "Commands: exact-bc, shortest-paths, estimate-bc" << std::endl;
     return 1;
   }
 
@@ -42,5 +35,24 @@ int main(int argc, char *argv[]) {
     for (auto &component : components) {
       testPathEstimation(component, num_samples);
     }
+    return 0;
+  }
+
+  if (command == "estimate-bc") {
+    if (components.size() != 1) {
+      std::cerr << "Should have one component";
+      return 1;
+    }
+
+    std::vector<Vertex<Graph>> centroids;
+    if (argc == 4) {
+      centroids = getAndApplyCentroids(components[0],
+                                       static_cast<size_t>(std::stoi(argv[3])));
+    } else {
+      centroids = getAndApplyCentroids(components[0]);
+    }
+
+    printEstimatedCentrality(components[0], centroids);
+    return 0;
   }
 }

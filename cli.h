@@ -2,6 +2,7 @@
 
 #include "brandes.h"
 #include "components.h"
+#include "estimation.h"
 #include "io.h"
 #include "paths.h"
 #include "traits.h"
@@ -28,6 +29,19 @@ template <class Graph> void printExactCentrality(Graph &graph) {
     result[graph[vertex].id] = bc[vertex];
   }
   std::cout << std::endl << "Exact BC: " << result << "\n";
+}
+
+template <class Graph>
+void printEstimatedCentrality(Graph &graph,
+                              const std::vector<Vertex<Graph>> &centroids) {
+  std::map<int64_t, long double> result;
+
+  auto bc = estimateBetwennessCentralityWithCentroidsOnly(graph, centroids);
+  for (const auto &vertex :
+       boost::make_iterator_range(boost::vertices(graph))) {
+    result[graph[vertex].id] = bc[vertex];
+  }
+  std::cout << std::endl << "Estimated BC: " << result << "\n";
 }
 
 template <class Graph>

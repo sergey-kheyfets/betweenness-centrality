@@ -7,6 +7,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/breadth_first_search.hpp>
 
+#include "diameter.h"
 #include "traits.h"
 
 template <class Graph>
@@ -148,6 +149,14 @@ std::vector<Vertex<Graph>> getAndApplyCentroids(Graph &graph,
                                                 long double delta = 0.1) {
   auto centroids_number = getCentroidsNumber(graph, c, delta);
   auto centroids = getBestCentroids(graph, centroids_number);
+  fillNearestCentroids(&graph, centroids);
+  return centroids;
+}
+
+template <class Graph>
+std::vector<Vertex<Graph>> getAndApplyCentroids(Graph &graph,
+                                                size_t num_centroids) {
+  auto centroids = getBestCentroids(graph, num_centroids);
   fillNearestCentroids(&graph, centroids);
   return centroids;
 }

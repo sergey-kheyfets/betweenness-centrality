@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
   if (argc < 3) {
     std::cerr << "Usage: " << argv[0]
               << " <dataset_filename> <command> <...parameters>" << std::endl;
-    std::cerr << "Commands: exact-bc, shortest-path" << std::endl;
+    std::cerr << "Commands: exact-bc, shortest-paths" << std::endl;
     return 1;
   }
 
@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
 
   if (command == "exact-bc") {
     if (components.size() != 1) {
-      std::cerr << "Should have one component" << std::endl;
+      std::cerr << "Should have one component";
       return 1;
     }
     printExactCentrality(components[0]);
@@ -35,14 +35,12 @@ int main(int argc, char *argv[]) {
 
   if (command == "shortest-paths") {
     size_t num_samples = 10;
-    if (argc == 3) {
-      num_samples = std::stoi(argv[2]);
+    if (argc == 4) {
+      num_samples = std::stoi(argv[3]);
     }
 
     for (auto &component : components) {
-      printBasicInfo(component);
       testPathEstimation(component, num_samples);
-      std::cout << "\n\n";
     }
   }
 }

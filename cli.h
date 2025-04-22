@@ -27,7 +27,7 @@ template <class Graph> void printExactCentrality(Graph &graph) {
        boost::make_iterator_range(boost::vertices(graph))) {
     result[graph[vertex].id] = bc[vertex];
   }
-  std::cout << std::endl << "Exact BC: " << result << "\n\n";
+  std::cout << std::endl << "Exact BC: " << result << "\n";
 }
 
 template <class Graph>

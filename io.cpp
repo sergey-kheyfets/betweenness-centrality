@@ -1,6 +1,6 @@
 #include "io.h"
 
-size_t addVertexIfNotExist(Graph &graph,
+size_t AddVertexIfNotExist(Graph &graph,
                            std::unordered_map<size_t, size_t> &compress,
                            size_t vertex) {
   if (compress.find(vertex) == compress.end()) {
@@ -13,15 +13,15 @@ size_t addVertexIfNotExist(Graph &graph,
 }
 
 // Function to add an edge between two nodes, adding vertices if necessary
-void addEdgeToGraph(Graph &graph, std::unordered_map<size_t, size_t> &compress,
+void AddEdgeToGraph(Graph &graph, std::unordered_map<size_t, size_t> &compress,
                     size_t first, size_t second) {
   // Add vertices if needed
-  first = addVertexIfNotExist(graph, compress, first);
-  second = addVertexIfNotExist(graph, compress, second);
+  first = AddVertexIfNotExist(graph, compress, first);
+  second = AddVertexIfNotExist(graph, compress, second);
   boost::add_edge(first, second, graph);
 }
 
-Graph readGraph(const std::filesystem::path &path) {
+Graph ReadGraph(const std::filesystem::path &path) {
   std::ifstream file(path);
   if (!file) {
     std::cerr << "Can't open file " << path << '.' << std::endl;
@@ -49,7 +49,7 @@ Graph readGraph(const std::filesystem::path &path) {
 
     // Add edge to the graph  (vertices are added automatically if they don't
     // exist)
-    addEdgeToGraph(graph, compress, first, second);
+    AddEdgeToGraph(graph, compress, first, second);
   }
 
   file.close();
@@ -57,7 +57,7 @@ Graph readGraph(const std::filesystem::path &path) {
   return graph;
 }
 
-void writeGraph(Graph *graph, const std::filesystem::path &path) {
+void WriteGraph(Graph *graph, const std::filesystem::path &path) {
   std::ofstream file(path);
   if (!file) {
     std::cerr << "Can't open file " << path << '.' << std::endl;

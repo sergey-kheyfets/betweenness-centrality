@@ -2,6 +2,8 @@
 
 #include <boost/graph/detail/adjacency_list.hpp>
 
+#include <deque>
+#include <queue>
 #include <stack>
 #include <unordered_map>
 #include <vector>
@@ -17,7 +19,7 @@
 #include "traits.h"
 
 template <class Graph>
-std::vector<size_t> getDistances(const Graph &graph,
+std::vector<size_t> GetDistances(const Graph &graph,
                                  const Vertex<Graph> &start) {
   std::vector<size_t> distances(boost::num_vertices(graph));
   auto recorder =
@@ -36,7 +38,7 @@ public:
       : graph_(graph), index_map_(boost::get(boost::vertex_index, graph)) {
     for (const auto &centroid : centroids) {
       centroid_distances_[index_map_[centroid]] =
-          std::move(getDistances(graph, centroid));
+          std::move(GetDistances(graph, centroid));
     }
   }
 
@@ -89,3 +91,44 @@ template <class Graph> struct CentroidInfo {
   std::map<Vertex<Graph>, size_t> distances, counts;
   std::map<Vertex<Graph>, long double> deltas;
 };
+
+template <class Graph>
+std::pair<std::vector<size_t>, std::map<size_t, size_t>>
+GetShortestPathCountsAndDistancesWithFinish(const Graph &graph,
+                                            Vertex<Graph> start,
+                                            Vertex<Graph> finish) {
+  std::vector<size_t> counts(boost::num_vertices(graph), 0);
+  counts[start] = 1;
+
+  std::map<size_t, size_t> distances;
+  distances[start] = 0;
+
+  std::queue<size_t> queue;
+  queue.push(start);
+
+  bool finish_reached = false;
+  while (!queue.empty()) {
+    auto vertex = queue.front();
+    queue.pop();
+    auto distance = distances[vertex];
+    if (finish_reached && distance == distances[finish]) {
+      break;
+    }
+    auto count = counts[vertex];
+    for (auto neighbour :
+         boost::make_iterator_range(boost::adjacent_vertices(vertex, graph))) {
+      if (distances.find(neighbour) == distances.end()) {
+        distances[neighbour] = distance + 1;
+        queue.push(neighbour);
+      }
+      if (distances[neighbour] == distance + 1) {
+        counts[neighbour] += count;
+      }
+      if (neighbour == finish) {
+        finish_reached = true;
+      }
+    }
+  }
+
+  return {counts, distances};
+}

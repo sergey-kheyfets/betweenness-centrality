@@ -23,5 +23,5 @@ struct VertexInfo {
 using Graph = boost::adjacency_list<boost::vecS, boost::vecS,
                                     boost::undirectedS, VertexInfo>;
 
-Graph readGraph(const std::filesystem::path &path);
-void writeGraph(Graph *graph, const std::filesystem::path &path);
+Graph ReadGraph(const std::filesystem::path &path);
+void WriteGraph(Graph *graph, const std::filesystem::path &path);

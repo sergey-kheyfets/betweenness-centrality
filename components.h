@@ -9,7 +9,7 @@
 
 template <class Graph>
   requires(!std::is_lvalue_reference<Graph>::value)
-auto splitIntoComponents(Graph &&graph) {
+auto SplitIntoComponents(Graph &&graph) {
   std::vector<size_t> component_map(boost::num_vertices(graph));
   auto num_components = boost::connected_components(graph, &component_map[0]);
   std::vector<Graph> result(num_components);

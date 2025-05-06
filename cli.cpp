@@ -9,13 +9,13 @@
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 #include <boost/graph/visitors.hpp>
 
-std::vector<Graph> readGraphIntoComponents(std::filesystem::path &path) {
+std::vector<Graph> ReadGraphIntoComponents(std::filesystem::path &path) {
   std::cout << "Reading graph..." << std::endl;
 
-  auto components = splitIntoComponents(readGraph(path));
+  auto components = SplitIntoComponents(ReadGraph(path));
   std::cout << "Number of components: " << components.size() << "\n";
   for (auto &graph : components) {
-    printBasicInfo(graph);
+    PrintBasicInfo(graph);
   }
   return components;
 }

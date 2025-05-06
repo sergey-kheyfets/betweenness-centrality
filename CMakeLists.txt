@@ -21,3 +21,12 @@ add_executable(betweenness-centrality main.cpp io.cpp cli.cpp)
 # Link the Boost Graph library to your executable
 target_link_libraries(betweenness-centrality PRIVATE Boost::graph)
 
+if(CMAKE_BUILD_TYPE MATCHES "Debug")
+  set(
+    CMAKE_C_FLAGS
+    "${CMAKE_C_FLAGS} -Werror -fsanitize=undefined -fsanitize=address"
+  )
+  target_link_options(betweenness-centrality
+    BEFORE PUBLIC -fsanitize=undefined PUBLIC -fsanitize=address
+  )
+endif()

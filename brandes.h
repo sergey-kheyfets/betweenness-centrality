@@ -2,6 +2,7 @@
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/breadth_first_search.hpp>
+#include <boost/graph/detail/adjacency_list.hpp>
 #include <boost/graph/visitors.hpp>
 
 #include <iostream>
@@ -34,26 +35,26 @@ public:
     auto target = boost::target(edge, graph);
     auto source = boost::source(edge, graph);
     distances[target] = distances[source] + 1;
-    Update_(source, target);
+    Update(source, target);
   }
 
   void non_tree_edge(const Edge<Graph> &edge, const Graph &graph) {
     auto target = boost::target(edge, graph);
     auto source = boost::source(edge, graph);
     if (distances[target] == distances[source] + 1) {
-      Update_(source, target);
+      Update(source, target);
     }
   }
 
 private:
-  void Update_(const Vertex<Graph> &source, const Vertex<Graph> &target) {
+  void Update(const Vertex<Graph> &source, const Vertex<Graph> &target) {
     counts[target] += counts[source];
     previous[target].push_back(source);
   }
 };
 
 template <class Graph>
-std::vector<long double> getExactBetwennessCentrality(const Graph &graph) {
+std::vector<long double> GetExactBetwennessCentrality(const Graph &graph) {
   auto num_vertices = boost::num_vertices(graph);
 
   std::vector<long double> centrality(num_vertices, 0);
@@ -84,6 +85,11 @@ std::vector<long double> getExactBetwennessCentrality(const Graph &graph) {
         centrality[vertex] += deltas[vertex];
       }
     }
+  }
+
+  auto norm = boost::num_vertices(graph) * (boost::num_vertices(graph) - 1);
+  for (size_t i = 0; i != centrality.size(); ++i) {
+    centrality[i] /= norm;
   }
 
   return centrality;

@@ -5,10 +5,11 @@
 #include "paths.h"
 
 #include <boost/graph/adjacency_list.hpp>
+#include <unordered_map>
 
-template <class Graph> size_t getEstimatedDiameter(const Graph &graph) {
+template <class Graph> size_t GetEstimatedDiameter(const Graph &graph) {
   auto start = *(boost::vertices(graph).first);
-  auto distances = getDistances(graph, start);
+  auto distances = GetDistances(graph, start);
 
   size_t first_max = 0;
   size_t second_max = 0;
@@ -24,10 +25,10 @@ template <class Graph> size_t getEstimatedDiameter(const Graph &graph) {
   return first_max + second_max;
 }
 
-template <class Graph> size_t getExactDiameter(const Graph &graph) {
+template <class Graph> size_t GetExactDiameter(const Graph &graph) {
   size_t max = 0;
   for (const auto &start : boost::make_iterator_range(boost::vertices(graph))) {
-    max = std::max(max, std::ranges::max(getDistances(graph, start)));
+    max = std::max(max, std::ranges::max(GetDistances(graph, start)));
   }
 
   return max;
